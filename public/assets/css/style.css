@@ -1,0 +1,25 @@
+body {
+    background: url("https://i0.wp.com/www.thewordisbond.com/wp-content/uploads/2015/08/Hip-Hop_News_by_thewordisbond.com_.jpg?zoom=2.625&resize=1189%2C505&ssl=1") center;
+   
+}
+
+  h1 {
+      color: rgb(168, 144, 8);
+      font-size: 40px;
+      padding-top: 25%; 
+  }
+
+  #label {
+        color: silver;
+        font-size: 20px;
+        margin-left: 40px;
+
+  }
+
+  #label2 {
+      padding: 20px;
+  }
+
+  #burger {
+        padding: 20px;
+        width: 300px; }

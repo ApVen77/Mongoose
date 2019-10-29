@@ -1,0 +1,16 @@
+<nav class="navbar ">
+
+</nav>
+
+<div class="container">
+    <h1>Mongo Scrape</h1>
+    <div class="dispaly-headlines">
+        {{#each db_headlines}}
+        <div class="row">
+            <div class="col-10">
+                <h3>{{this.title}}</h3>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>
