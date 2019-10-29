@@ -31,7 +31,8 @@ var headlineSchema = new schema ({
     }, 
 
     note: {
-
+        type: Schema.Types.ObjectId,
+        ref: "Note"
     },
 
     saved: {
