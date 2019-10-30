@@ -1,116 +1,107 @@
-// Dependencies
 var express = require("express");
-var mongojs = require("mongojs");
+var logger = require("morgan");
+var mongoose = require("mongoose");
+
+var PORT = 3000;
+
+// Require all models
+var db = require("./models");
 
 // Initialize Express
 var app = express();
 
-// Set up a static folder (public) for our web app
+// Configure middleware
+
+// Use morgan logger for logging requests
+app.use(logger("dev"));
+// Parse request body as JSON
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+// Make public a static folder
 app.use(express.static("public"));
 
-// Database configuration
-// Save the URL of our database as well as the name of our collection
-var databaseUrl = "hiphop";
-var collections = ["articles"];
+// Connect to the Mongo DB
+mongoose.connect("mongodb://localhost/populate", { useNewUrlParser: true });
 
-// Use mongojs to hook the database to the db variable
-var db = mongojs(databaseUrl, collections);
-
-// This makes sure that any errors are logged if mongodb runs into an issue
-db.on("error", function(error) {
-  console.log("Database Error:", error);
-});
+// When the server starts, create and save a new Library document to the db
+// The "unique" rule in the Library model's schema will prevent duplicate libraries from being added to the server
+db.Library.create({ name: "Campus Library" })
+  .then(function(dbLibrary) {
+    // If saved successfully, print the new Library document to the console
+    console.log(dbLibrary);
+  })
+  .catch(function(err) {
+    // If an error occurs, print it to the console
+    console.log(err.message);
+  });
 
 // Routes
-// 1. At the root path, send a simple hello world message to the browser
-app.get("/", function(req, res) {
-  res.send("Hello world");
-});
 
-// 2. At the "/all" path, display every entry in the animals collection
-app.get("/all", function(req, res) {
-  // Query: In our database, go to the animals collection, then "find" everything
-  db.articles.find({}, function(error, found) {
-    // Log any errors if the server encounters one
-    if (error) {
-      console.log(error);
-    }
-    // Otherwise, send the result of this query to the browser
-    else {
-      res.json(found);
-    }
-  });
-});
-
-// 3. At the "/name" path, display every entry in the animals collection, sorted by name
-app.get("/name", function(req, res) {
-  // Query: In our database, go to the animals collection, then "find" everything,
-  // but this time, sort it by name (1 means ascending order)
-  db.animals.find().sort({ name: 1 }, function(error, found) {
-    // Log any errors if the server encounters one
-    if (error) {
-      console.log(error);
-    }
-    // Otherwise, send the result of this query to the browser
-    else {
-      res.json(found);
-    }
-  });
-});
-
-// 4. At the "/weight" path, display every entry in the animals collection, sorted by weight
-app.get("/summary", function(req, res) {
-  // Query: In our database, go to the animals collection, then "find" everything,
-  // but this time, sort it by weight (-1 means descending order)
-  db.articles.find().sort({ weight: -1 }, function(error, found) {
-    // Log any errors if the server encounters one
-    if (error) {
-      console.log(error);
-    }
-    // Otherwise, send the result of this query to the browser
-    else {
-      res.json(found);
-    }
-  });
-});
-
-// Set the app to listen on port 3000
-app.listen(3000, function() {
-  console.log("App running on port 3000!");
-});
-var cheerio = require("cheerio");
-var axios = require("axios");
-
-// Make a request via axios to grab the HTML body from the site of your choice
-axios.get("https://www.worldstarhiphop.com/videos/").then(function(response) {
-
-  // Load the HTML into cheerio and save it to a variable
-  // '$' becomes a shorthand for cheerio's selector commands, much like jQuery's '$'
-  var $ = cheerio.load(response.data);
-
-  // An empty array to save the data that we'll scrape
-  var results = [ ];
-  console.log ("it's working")
-  // Select each element in the HTML body from which you want information.
-  // NOTE: Cheerio selectors function similarly to jQuery's selectors,
-  // but be sure to visit the package's npm page to see how it works
-  $("articles").each(function(i, element) {
-
-    var title = $(element).children().text();
-    var text = $(element).children().text();
-    var published =$(element).find().attr(); 
-    var link = $(element).find("a").attr("href");
-
-    
-    // Save these results in an object that we'll push into the results array we defined earlier
-    results.push({
-      name: title,
-      text: summary,
-      category: URL,
-      published: date 
+// POST route for saving a new Book to the db and associating it with a Library
+app.post("/submit", function(req, res) {
+  // Create a new Book in the database
+  db.Book.create(req.body)
+    .then(function(dbBook) {
+      // If a Book was created successfully, find one library (there's only one) and push the new Book's _id to the Library's `books` array
+      // { new: true } tells the query that we want it to return the updated Library -- it returns the original by default
+      // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
+      return db.Library.findOneAndUpdate({}, { $push: { books: dbBook._id } }, { new: true });
+    })
+    .then(function(dbLibrary) {
+      // If the Library was updated successfully, send it back to the client
+      res.json(dbLibrary);
+    })
+    .catch(function(err) {
+      // If an error occurs, send it back to the client
+      res.json(err);
     });
-  });
+});
 
-  // Log the results once you've looped through each of the elements found with cheerio
-  console.log(results);
+// Route for getting all books from the db
+app.get("/books", function(req, res) {
+  // Using our Book model, "find" every book in our db
+  db.Book.find({})
+    .then(function(dbBook) {
+      // If any Books are found, send them to the client
+      res.json(dbBook);
+    })
+    .catch(function(err) {
+      // If an error occurs, send it back to the client
+      res.json(err);
+    });
+});
+
+// Route for getting all libraries from the db
+app.get("/library", function(req, res) {
+  // Using our Library model, "find" every library in our db
+  db.Library.find({})
+    .then(function(dbLibrary) {
+      // If any Libraries are found, send them to the client
+      res.json(dbLibrary);
+    })
+    .catch(function(err) {
+      // If an error occurs, send it back to the client
+      res.json(err);
+    });
+});
+
+// Route to see what library looks like WITH populating
+app.get("/populated", function(req, res) {
+  // Using our Library model, "find" every library in our db and populate them with any associated books
+  db.Library.find({})
+    // Specify that we want to populate the retrieved libraries with any associated books
+    .populate("books")
+    .then(function(dbLibrary) {
+      // If any Libraries are found, send them to the client with any associated Books
+      res.json(dbLibrary);
+    })
+    .catch(function(err) {
+      // If an error occurs, send it back to the client
+      res.json(err);
+    });
+});
+
+// Start the server
+app.listen(PORT, function() {
+  console.log("App running on port " + PORT + "!");
 });
