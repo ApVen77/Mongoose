@@ -1,16 +1,27 @@
-<nav class="navbar ">
-
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/">Scrape Me Now</a>
+    <ul>
+        <li><a href="/scrape" class=""> Scape Me Now</a></li>
+        <li><a href="/saved" class=""> Save Me Now</a></li>
+        <li><a href="/note" class=""> Leave a Note</a></li>
+    </ul>
 </nav>
 
 <div class="container">
-    <h1>Mongo Scrape</h1>
+    <h1>Mongo Scrape Latest News from <i>hiphopdx.com</i></h1>
     <div class="dispaly-headlines">
-        {{#each db_headlines}}
+        {{#each db_title}}
+        {{#unless this.saved}}
         <div class="row">
-            <div class="col-10">
+            <div class="col-8">
+
                 <h3>{{this.title}}</h3>
+                <h3>{{this.url}}</h3>
+                <h3>{{this.summary}}</h3>
             </div>
         </div>
+        {{/unless}}
         {{/each}}
+
     </div>
 </div>

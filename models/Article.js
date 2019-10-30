@@ -7,7 +7,7 @@ var Schema = mongoose.Schema;
 // Using the Schema constructor, create a new LibrarySchema object
 // This is similar to a Sequelize model
 
-var headlineSchema = new schema({
+var articlesSchema = new Schema({
     
     title: {
         type: "String",
@@ -39,6 +39,6 @@ var headlineSchema = new schema({
     });
 
 
-var hiphop = mongoose.model("hiphop", hiphopSchema);
+var Article = mongoose.model("Article", articlesSchema);
 
-module.exports = hiphop; 
+module.exports = Article; 
