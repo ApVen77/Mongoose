@@ -1,63 +1,80 @@
-// We'll be rewriting the table's data frequently, so let's make our code more DRY
-// by writing a function that takes in 'animals' (JSON) and creates a table body
-function displayResults(articles) {
-    // First, empty the table
-    $("tbody").empty();
-  
-    // Then, for each entry of that json...
-    article.forEach(function(animal) {
-      // Append each of the animal's properties to the table
-      var tr = $("<tr>").append(
-        $("<td>").text(articles.headline),
-        $("<td>").text(articles.summary),
-        $("<td>").text(articles.url),
-        $("<td>").text(articles.date),
-      );
-  
-      $("tbody").append(tr);
-    });
+//SCRAPE
+$("#scrape-btn").on("click", function() {
+  $.ajax({
+      method: "GET",
+      url: "/scrape",
+  }).done(function(data) {
+      console.log(data)
+      window.location = "/"
+  })
+});
+
+//SAVE ARTICLE
+$(".save").on("click", function() {
+  var thisId = $(this).attr("data-id");
+  $.ajax({
+      method: "POST",
+      url: "/articles/save/" + thisId
+  }).done(function(data) {
+      window.location = "/"
+  })
+});
+
+//DELETE ARTICLE
+$(".delete").on("click", function() {
+  var thisId = $(this).attr("data-id");
+  $.ajax({
+      method: "POST",
+      url: "/articles/delete/" + thisId
+  }).done(function(data) {
+      window.location = "/saved"
+  })
+});
+
+//SAVE NOTE
+$(".save-note").on("click", function() {
+  var thisId = $(this).attr("data-id");
+  if (!$("#note-Body" + thisId).val()) {
+      alert("please enter a note to save")
+  }else {
+    $.ajax({
+          method: "POST",
+          url: "/notes/save/" + thisId,
+          data: {
+            text: $("#note-Body" + thisId).val()
+          }
+        }).done(function(data) {
+            // Log the response
+            console.log(data);
+            // Empty the notes section
+            $("#note-Body" + thisId).val("");
+            $(".modalNote").modal("hide");
+            window.location = "/saved"
+        });
   }
-  
-  // Bonus function to change "active" header
-  function setActive(selector) {
-    // remove and apply 'active' class to distinguish which column we sorted by
-    $("th").removeClass("active");
-    $(selector).addClass("active");
-  }
-  
-  // 1: On Load
-  // ==========
-  
-  // First thing: ask the back end for json with all 
-  $.getJSON("/all", function(data) {
-    // Call our function to generate a table body
-    displayResults(data);
-  });
-  
-  // 2: Button Interactions
-  // ======================
-  
-  // When user clicks the weight sort button, display table sorted by weight
-//   $("#label").on("click", function() {
-//     // Set new column as currently-sorted (active)
-//     setActive("#article-title");
-  
-//     // Do an api call to the back end for json with all animals sorted by weight
-//     $.getJSON("/title", function(data) {
-//       // Call our function to generate a table body
-//       displayResults(data);
-//     });
-//   });
-  
-//   // When user clicks the name sort button, display the table sorted by name
-//   $("#label2").on("click", function() {
-//     // Set new column as currently-sorted (active)
-//     setActive("#article-summary");
-  
-    // Do an api call to the back end for json with all animals sorted by name
-    $.getJSON("/summary", function(data) {
-      // Call our function to generate a table body
-      displayResults(data);
-    });
-  
-  
+});
+
+//DELTE NOTE
+$(".delete-note-btn").on("click", function() {
+  var noteId = $(this).attr("data-note-id");
+  var articleId = $(this).attr("data-article-id");
+  $.ajax({
+      method: "DELETE",
+      url: "/notes/delete/" + noteId + "/" + articleId
+  }).done(function(data) {
+      console.log(data)
+      $(".modalNote").modal("hide");
+      window.location = "/saved"
+  })
+});
+
+//DELETE BUTTON
+$("#delete-btn").on("click", function() {
+  $.ajax({
+      method: "GET",
+      url: "/clear"
+  }).done(function(data) {
+      console.log("CLEAR")
+      window.location = '/'
+  })
+})
