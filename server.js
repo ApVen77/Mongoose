@@ -30,8 +30,11 @@ app.use(express.static("public"));
 app.engine("handlebars", exphbs({ defaultLayout: "main"}))
 app.set("view engine", "handlebars"); 
 app.use(routes)
+
 // Connect to the Mongo DB
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/hiphop");
+var URI = process.env.MONGODB_URI || "mongodb://localhost/hiphop";
+mongoose.connect(URI)
+var db = mongoose.connection;
 app.listen(PORT, function() {
   console.log("App running on port " + PORT + "!");
 });

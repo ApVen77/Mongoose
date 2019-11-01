@@ -7,7 +7,8 @@ var Article = require("../models/Article");
 
 var logger = require("morgan");
 var mongoose = require("mongoose");
-
+var axios = require("axios");
+var cheerio = require("cheerio") 
 
 // app.use(bodyParser.urlencoded({ extended: true }));
 router.get("/", (req, res) =>{
@@ -21,20 +22,20 @@ router.get("/scrape", function(req, res) {
     var $ = cheerio.load(response.data);
 
     // Now, we grab every h3 within an article tag
-    $("article h3").each(function(i, element) {
+    $("article h2").each(function(i, element) {
       // Save an empty result object
       var result = {};
 
       // Add the text and href of every link, and save them as properties of the result object
-      result.title = $(this)
+      result.title =  $(this)
         .children("a")
         .text();
-      result.link = $(this)
+      result.url = $(this)
         .children("a")
 //         .attr("href");
             console.log("result: " + result)
       // Create a new Article using the `result` object built from scraping
-      Article.create(result)
+      db.Article.create(result)
         .then(function(dbArticle) {
           // View the added result in the console
           console.log(dbArticle);
