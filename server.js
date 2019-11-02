@@ -22,7 +22,7 @@ var app = express();
 
 var routes = require("./config/routes.js")
 app.use(logger("dev"));
-// Parse request body as JSON
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // Make public a static folder
@@ -32,9 +32,11 @@ app.set("view engine", "handlebars");
 app.use(routes)
 
 // Connect to the Mongo DB
-var URI = process.env.MONGODB_URI || "mongodb://localhost/hiphop";
-mongoose.connect(URI)
-var db = mongoose.connection;
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/hiphop";
+// mongoose.connect(URI)
+mongoose.Promise = Promise;
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+
 app.listen(PORT, function() {
   console.log("App running on port " + PORT + "!");
 });
