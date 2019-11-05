@@ -14,20 +14,20 @@
 </nav>
 
 <div class="container">
-    <h1>Mongo Scrape Latest News from <i>hiphopdx.com</i></h1>
+    <h1>Mongo Scrape Latest News from <i>thesource.com</i></h1>
     <div class="dispaly-headlines">
         {{#each db_title}}
-        {{#unless this.saved}}
+       
         <div class="row">
             <div class="col-8">
 
                 <h3>{{this.title}}</h3>
                 <h3>{{this.url}}</h3>
-                <h3>{{this.summary}}</h3>
             </div>
         </div>
-        {{/unless}}
+        
         {{/each}}
 
     </div>
 </div>
+

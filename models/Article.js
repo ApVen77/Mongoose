@@ -11,21 +11,15 @@ var articlesSchema = new Schema({
     
     title: {
         type: "String",
-        required: true,
+        required: true
     },
 
     url: {
-        type: "String",
-        required: "not a valid url",
+        type: "String"
+        // required: "not a valid url",
 
     },
 
-    summary: {
-        type: "String",
-        required: true,
-        trim: true
-
-    },
 
     note: {
         type: Schema.Types.ObjectId,

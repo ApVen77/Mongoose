@@ -1,105 +1,108 @@
-var express = require("express");
-var router = express.Router();
+// var express = require("express");
+// var app = express();
 //var scrape = require("../scripts/scrape");
-var Article = require("../models/Article");
+
+var db = require("../models");
 
 
 
-var logger = require("morgan");
-var mongoose = require("mongoose");
+
 var axios = require("axios");
 var cheerio = require("cheerio") 
-
+module.exports= function(app) {
 // app.use(bodyParser.urlencoded({ extended: true }));
-router.get("/", (req, res) =>{
+app.get("/", (req, res) =>{
+  console.log("you hit it")
     res.render("home");
 });
-// A GET route for scraping the website
-router.get("/scrape", function(req, res) {
-  // First, we grab the body of the html with axios
-  axios.get("https://hiphopdx.com/news").then(function(response) {
+// SCRAPE
+app.get("/scrape", function(req, res) {
+  
+  // grab the body of the html with axios
+  axios.get("https://thesource.com/category/news/").then(function(response) {
     
     var $ = cheerio.load(response.data);
 
     // Now, we grab every h3 within an article tag
-    $("h3").each(function(i, element) {
+    $("article h2").each(function(i, element) {
       // Save an empty result object
       var result = {};
 
-      // Add the text and href of every link, and save them as properties of the result object
+      // Add the text and href of every link
       result.title =  $(this)
         .children("a")
         .text();
       result.url = $(this)
         .children("a")
-//         .attr("href");
-            console.log("result: " + result)
-      // Create a new Article using the `result` object built from scraping
+         .attr("href");
+            console.log("title of the ****** "+result.title)
+      
       db.Article.create(result)
         .then(function(dbArticle) {
-          // View the added result in the console
+         
           console.log(dbArticle);
                 res.render("home", {db_title: dbArticle})
+                
+
         })
         .catch(function(err) {
           // If an error occurred, log it
           console.log(err);
         });
+
     });
 
-    // Send a message to the client
-    res.send("You Got Scrapped!");
+    
   });
 });
 
 // Route for getting all Articles from the db
-router.get("/articles", function(req, res) {
-  // Grab every document in the Articles collection
-  db.articles.find({})
+app.get("/articles", function(req, res) {
+
+  db.Article.find({})
     .then(function(dbArticle) {
-      // If we were able to successfully find Articles, send them back to the client
+
       res.json(dbArticle);
     })
     .catch(function(err) {
-      // If an error occurred, send it to the client
+     
       res.json(err);
     });
 });
 
-// Route for grabbing and populates  note
-router.get("/articles/:id", function(req, res) {
-  // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
-  db.articles.findOne({ _id: req.params.id })
-    // ..and populate all of the notes associated with it
+
+app.get("/articles/:id", function(req, res) {
+  
+  db.Article.findOne({ _id: req.params.id })
+    
     .populate("note")
     .then(function(dbArticle) {
-      // If we were able to successfully find an Article with the given id, send it back to the client
+      // send article back to the client
       res.json(dbArticle);
     })
     .catch(function(err) {
-      // If an error occurred, send it to the client
+      // send error to the client
       res.json(err);
     });
 });
 
-// Route for saving/updating an Article's associated Note
-router.post("/articles/:id", function(req, res) {
-  // Create a new note and pass the req.body to the entry
-  db.Note.create(req.body)
-    .then(function(dbNote) {
+// saving/updating an Article's associated Note
+ app.post("/articles/:id", function(req, res) {
+   // Create a new note and pass the req.body to the entry
+   db.Note.create(req.body)
+     .then(function(dbNote) {
       
-      // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
-      return db.articles.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
-    })
-    .then(function(dbArticle) {
-      // If we were able to successfully update an Article, send it back to the client
-      res.json(dbArticle);
-    })
-    .catch(function(err) {
-      // If an error occurred, send it to the client
-      res.json(err);
-    });
+      
+       return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
+     })
+     .then(function(dbArticle) {
+    
+       res.json(dbArticle);
+     })
+     .catch(function(err) {
+     
+       res.json(err);
+     });
 });
-
-module.exports = router;
+}
 

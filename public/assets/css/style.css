@@ -1,7 +1,31 @@
-#navbar {
+ul {
     font-size: 30px;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
 }
 
+li {
+    float: left; 
+}
+
+li a { 
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover:not(.active) {
+    background-color: #111;
+}
+
+#navbar {
+    background-color: #4CAF50;
+}
 
 body {
     background: url("https://i0.wp.com/www.thewordisbond.com/wp-content/uploads/2015/08/Hip-Hop_News_by_thewordisbond.com_.jpg?zoom=2.625&resize=1189%2C505&ssl=1") center;
@@ -11,7 +35,7 @@ body {
   h1 {
       color: rgb(168, 144, 8);
       font-size: 40px;
-      padding-top: 25%; 
+      padding-top: 15%; 
   }
 
   #label {

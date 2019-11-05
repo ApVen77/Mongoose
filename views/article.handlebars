@@ -1,0 +1,62 @@
+
+<!-- Pass in data from server.js -->
+
+
+
+<div>
+
+  <h1>{{article.title}}</h1>
+
+  <p><span class="label">Author: </span>{{article.author}}</p>
+
+  <p><img src="{{article.image}}" style="float: left" />{{article.blurb}}</p>
+
+  <div style="clear: both"></div>
+
+
+
+  <hr>
+
+</div>
+
+{{#if article.comment}}
+
+<div>
+
+  <h1>Comment</h1>
+
+  <h3>{{article.comment.title}}</h3>
+
+  <p>{{article.comment.body}}</p>
+
+</div>
+
+{{/if}}
+
+{{#unless article.comment}}
+
+<h4>Add a Comment</h4>
+
+<form>
+
+  <div class="form-group">
+
+    <label for="Input">Title</label>
+
+    <input type="Input" class="form-control" id="titleinput" placeholder="Title">
+
+  </div>
+
+  <div class="form-group">
+
+    <label for="Textarea">Textarea</label>
+
+    <textarea id="bodyinput" class="form-control" rows="3"></textarea>
+
+    <button type="submit" id="saveComment" data-id="{{article._id}}">Comment</button>
+
+  </div>
+
+</form>
+
+{{/unless}}
